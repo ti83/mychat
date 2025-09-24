@@ -23,6 +23,7 @@ conversations.MapPost("/", conversationService.CreateNewConversation);
 conversations.MapPut("/{id}", conversationService.UpdateConversation);
 conversations.MapPost("/{id}/message", conversationService.AddMessageToConversation);
 conversations.MapPost("/ask/{id}", conversationService.AskQuestion);
+conversations.MapPost("/suggest-title", conversationService.SuggestConversationTitleFromPrompt);
 
 app.Run();
 

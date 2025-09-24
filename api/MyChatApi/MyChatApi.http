@@ -60,3 +60,8 @@ Content-Type: application/json
 }
 
 ###
+
+@prompt="I would like you to give me an example of how to create vue.js app that will act as a chat bot.  Use TypeScript instead of javascript.  I would like it to use material design."
+POST {{MyChatApi_HostAddress}}/conversation/suggest-title?prompt={{prompt}}
+
+###

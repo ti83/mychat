@@ -31,4 +31,9 @@ namespace MyChatApi
         public ConversationItemDto(ConversationDto conversation) =>
         (Id, Title) = (conversation.Id, conversation.Title);
     }
+
+    public class ConversationTitleSuggestionDto
+    {
+        public string? Title { get; set; }
+    }
 }

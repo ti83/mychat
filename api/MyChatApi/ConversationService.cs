@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OllamaSharp;
 using OllamaSharp.Models;
+using System.Threading;
 
 namespace MyChatApi
 {
@@ -13,6 +14,25 @@ namespace MyChatApi
         public ConversationService(ConversationDb db) 
         {
             _db = db;
+        }
+
+        public async Task<IResult> SuggestConversationTitleFromPrompt(HttpContext context, [FromServices] OllamaApiClient ollama, string prompt)
+        {
+            if (prompt == null) return TypedResults.NotFound();
+            var cancellationToken = context.RequestAborted;
+            var request = new GenerateRequest
+            {
+                Model = "llama3",
+                Prompt = $"Suggest a short title for the following conversation:\n\n{prompt}\n\nTitle:",
+                Stream = false,
+            };
+            var response = string.Empty;
+            await foreach (var stream in ollama.GenerateAsync(request, cancellationToken))
+            {
+                response+=(stream?.Response);                
+            }
+            var title = response.Trim().Trim('"').Trim('\'');
+            return TypedResults.Ok(new ConversationTitleSuggestionDto { Title = title });
         }
 
         public async Task<IResult> CreateNewConversation(ConversationDto conversation)
@@ -40,11 +60,13 @@ namespace MyChatApi
             await _db.SaveChangesAsync();
             return TypedResults.NoContent();
         }
+
         public async Task<IResult> GetConversation(int id)
         {
             var conversation = await _db.Conversations.FindAsync(id);
             return conversation is not null ? TypedResults.Ok(conversation) : TypedResults.NotFound();
         }
+
         public async Task<IResult> GetAllConversations()
         {
             var conversations = await _db.Conversations.Select(c => new ConversationItemDto(c)).ToArrayAsync();
@@ -53,6 +75,7 @@ namespace MyChatApi
 
         public async Task AskQuestion(HttpContext context, [FromServices] OllamaApiClient ollama, int id, MessageDto message)
         {
+
             var existingConversation = await _db.Conversations.FindAsync(id);
             if (existingConversation is null) 
             {
