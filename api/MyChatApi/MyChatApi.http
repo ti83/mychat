@@ -1,0 +1,28 @@
+﻿@MyChatApi_HostAddress = https://localhost:7192
+
+
+POST {{MyChatApi_HostAddress}}/conversation
+Content-Type: application/json
+
+{
+  "title":"this is a another test"
+}
+
+###
+
+@id1=1
+POST {{MyChatApi_HostAddress}}/conversation/{{id1}}/message
+Content-Type: application/json
+
+{
+  "text":"I don't know this carmen san dieago. Can you please elaborate?",
+  "source":"llm",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+###
+
+@id2=1
+GET {{MyChatApi_HostAddress}}/conversation/{{id2}}
+
+###
