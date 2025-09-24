@@ -6,10 +6,10 @@ using OllamaSharp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ConversationDb>(opt => opt.UseInMemoryDatabase("ConversationList"));
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<ConversationService>();
 var ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"));
+ollamaClient.SelectedModel = "llama3";
 builder.Services.AddSingleton(ollamaClient);
 
 var app = builder.Build();
