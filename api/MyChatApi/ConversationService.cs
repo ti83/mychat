@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OllamaSharp;
 using OllamaSharp.Models;
 using System.Threading;
@@ -61,10 +63,25 @@ namespace MyChatApi
             return TypedResults.NoContent();
         }
 
+        private async Task UpdateMessage(int id, int messageId, string messageText)
+        {
+            var conversation = await _db.Conversations.FindAsync(id);
+            if (conversation is null) return;
+            var existingMessage = conversation.Messages.FirstOrDefault(m => m.Id == messageId);
+            if (existingMessage is null) return ;
+            existingMessage.Text = messageText;
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<IResult> GetConversation(int id)
         {
             var conversation = await _db.Conversations.FindAsync(id);
             return conversation is not null ? TypedResults.Ok(conversation) : TypedResults.NotFound();
+        }
+        public async Task<IResult> GetConversationHeader(int id)
+        {
+            var conversation = await _db.Conversations.FindAsync(id);
+            return conversation is not null ? TypedResults.Ok(new ConversationItemDto(conversation)) : TypedResults.NotFound();
         }
 
         public async Task<IResult> GetAllConversations()
@@ -91,9 +108,19 @@ namespace MyChatApi
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(existingConversation.Title))
+            {
+                var response = await SuggestConversationTitleFromPrompt(context, ollama, message.Text);
+                var okResponse = response as Microsoft.AspNetCore.Http.HttpResults.Ok<ConversationTitleSuggestionDto>;
+                var suggestion = okResponse?.Value;
+                if (suggestion != null)
+                {
+                    existingConversation.Title = suggestion.Title;
+                }
+            }
+            
             // Retrieve previous messages.
-            var conversation = await _db.Conversations.FindAsync(id);
-            var messages = conversation.Messages.OrderBy(m => m.TimeStamp)
+            var messages = existingConversation.Messages.OrderBy(m => m.TimeStamp)
                 .Select(m => m.GetMessage())
                 .ToList();
 
@@ -116,15 +143,17 @@ namespace MyChatApi
                 TimeStamp = DateTime.UtcNow,                
             };
 
+            existingConversation.Messages.Add(responseMessage);
+
             await foreach (var response in chat.SendAsync(message.Text, cancellationToken))
             {
                 responseMessage.Text += response;
-                await context.Response.WriteAsync(response);
-                await context.Response.Body.FlushAsync(cancellationToken);
             }
 
-            await AddMessageToConversation(id, responseMessage);
-
+            await _db.SaveChangesAsync();
+            var json = JsonConvert.SerializeObject(responseMessage, Formatting.None);
+            await context.Response.WriteAsync(json);
+            await context.Response.Body.FlushAsync(cancellationToken);
         }
     }
 }

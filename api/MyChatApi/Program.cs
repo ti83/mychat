@@ -19,6 +19,7 @@ RouteGroupBuilder conversations = app.MapGroup("/conversation");
 var conversationService = app.Services.CreateScope().ServiceProvider.GetRequiredService<ConversationService>();
 conversations.MapGet("/", conversationService.GetAllConversations);
 conversations.MapGet("/{id}", conversationService.GetConversation);
+conversations.MapGet("/{id}/header", conversationService.GetConversationHeader);
 conversations.MapPost("/", conversationService.CreateNewConversation);
 conversations.MapPut("/{id}", conversationService.UpdateConversation);
 conversations.MapPost("/{id}/message", conversationService.AddMessageToConversation);

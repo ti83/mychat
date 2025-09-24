@@ -36,4 +36,10 @@ namespace MyChatApi
     {
         public string? Title { get; set; }
     }
+
+    public class ResponseFragment
+    {
+        public string? Response { get; set; }
+        public int MessageId { get; set; }
+    }
 }
