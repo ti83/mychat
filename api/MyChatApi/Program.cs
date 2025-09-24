@@ -1,11 +1,17 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyChatApi;
+using OllamaSharp;
+using OllamaSharp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ConversationDb>(opt => opt.UseInMemoryDatabase("ConversationList"));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<ConversationService>();
+var ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"));
+builder.Services.AddSingleton(ollamaClient);
+
 var app = builder.Build();
 
 
@@ -16,6 +22,7 @@ conversations.MapGet("/{id}", conversationService.GetConversation);
 conversations.MapPost("/", conversationService.CreateNewConversation);
 conversations.MapPut("/{id}", conversationService.UpdateConversation);
 conversations.MapPost("/{id}/message", conversationService.AddMessageToConversation);
+conversations.MapPost("/ask/{id}", conversationService.AskQuestion);
 
 app.Run();
 

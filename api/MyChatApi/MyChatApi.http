@@ -26,3 +26,37 @@ Content-Type: application/json
 GET {{MyChatApi_HostAddress}}/conversation/{{id2}}
 
 ###
+
+POST {{MyChatApi_HostAddress}}/ask
+{
+  "text":"I don't know this carmen san dieago. Can you please elaborate?",
+  "source":"user",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+
+###
+
+@id3=1
+POST {{MyChatApi_HostAddress}}/conversation/ask/{{id3}}
+Content-Type: application/json
+
+{
+  "text":"Please tell me a childrens story about mice.",
+  "source":"user",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+###
+
+@id4=1
+POST {{MyChatApi_HostAddress}}/conversation/ask/{{id4}}
+Content-Type: application/json
+
+{
+  "text":"Now tell refine the above story so it's interesting for adults.",
+  "source":"user",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+###

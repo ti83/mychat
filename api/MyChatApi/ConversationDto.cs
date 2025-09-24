@@ -1,4 +1,6 @@
-﻿namespace MyChatApi
+﻿using OllamaSharp.Models.Chat;
+
+namespace MyChatApi
 {
     public class MessageDto
     {
@@ -6,6 +8,12 @@
         public string? Text { get; set; }
         public string Source { get; set; }
         public DateTime TimeStamp { get; set; }
+
+        public Message GetMessage() => new Message
+        {
+            Role = Source != "user" ? "assistant" : Source,
+            Content = Text ?? string.Empty
+        };
     }
 
     public class ConversationDto
