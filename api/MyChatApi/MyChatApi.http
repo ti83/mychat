@@ -63,12 +63,7 @@ Content-Type: application/json
 POST {{MyChatApi_HostAddress}}/conversation/ask/{{id4}}
 Content-Type: application/json
 
-{
-  "text":"Now tell refine the above story so it's interesting for adults.",
-  "source":"user",
-  "timestamp":"2025-09-23T21:30:56Z"
-}
-
+{"TimeStamp":"2025-09-29T21:38:27.187Z","Text":"tell me a story about a cowboy","Source":"user"}
 ###
 
 @prompt="I would like you to give me an example of how to create vue.js app that will act as a chat bot.  Use TypeScript instead of javascript.  I would like it to use material design."
@@ -79,5 +74,9 @@ POST {{MyChatApi_HostAddress}}/conversation/suggest-title?prompt={{prompt}}
 
 @id5=1
 GET {{MyChatApi_HostAddress}}/conversation/{{id5}}/header
+
+###
+
+GET {{MyChatApi_HostAddress}}/conversation
 
 ###
