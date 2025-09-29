@@ -1,47 +1,44 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import MyChat from './components/MyChat.vue'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <div class="header-content">
+      <img alt="Chat Logo" class="logo" src="./assets/icons8-chat-96.png" width="48" height="48" />
+      <div class="title">My Chat</div>
     </div>
   </header>
-
   <main>
-    <TheWelcome />
+    <MyChat />
   </main>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.header-content {
+  display: flex;
+  align-items: center;
 }
 
 .logo {
-  display: block;
-  margin: 0 auto 2rem;
+  margin: 0;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.title {
+  margin-left: 1rem;
+  color: black;
+  font-weight: bold;
+  font-size: 1.75rem;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+header {
+  width: 100%;
+  padding: 1rem;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+main {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 </style>
