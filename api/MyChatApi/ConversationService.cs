@@ -25,7 +25,7 @@ namespace MyChatApi
             var request = new GenerateRequest
             {
                 Model = "llama3",
-                Prompt = $"Suggest a short title for the following conversation:\n\n{prompt}\n\nTitle:",
+                Prompt = $"Suggest a short title (only return the suggested title) for the following conversation:\n\n{prompt}",
                 Stream = false,
             };
             var response = string.Empty;

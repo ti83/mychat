@@ -2,11 +2,13 @@
 import { ref, onMounted as vueOnMounted } from 'vue'
 import type { Conversation } from '@/types/Conversation'
 import type { Message } from '@/types/Message'
+import ConversationApiService from '@/services/ConversationApiService'
 import MessageItem from './MessageItem.vue'
 
-const newMessage = ref('tell me a story about a cowboy')
+const newMessage = ref('')
 const currentConversation = ref<Conversation | null>(null)
 const isRequestProcessing = ref(false)
+const apiService = new ConversationApiService()
 
 async function sendMessage(): Promise<void> {
   if (!newMessage.value.trim()) {
@@ -14,36 +16,41 @@ async function sendMessage(): Promise<void> {
   }
   isRequestProcessing.value = true
   await createNewConversation()
-  console.trace('Send message:', newMessage.value)
   const now = new Date()
   const newMsg: Message = {
+    id: 0,
     timestamp: new Date(now.toUTCString()),
     text: newMessage.value,
     source: 'user',
   }
-
   currentConversation.value?.messages.push(newMsg)
-  const url = `https://localhost:7192/conversation/ask/${currentConversation.value?.id}`
-  try {
-    console.trace('messages being sent to server:' + JSON.stringify(newMsg))
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newMsg),
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const returnedMessage: Message = await response.json()
-    console.log('Received message from server:', returnedMessage)
-    currentConversation.value?.messages.push(returnedMessage)
-    newMessage.value = ''
-  } catch (error) {
-    console.error('Error sending message:', error)
+  newMessage.value = ''
+  const returnedMessage: Message = await apiService.SendMessage(
+    currentConversation.value!.id,
+    newMsg,
+  )
+
+  if (!returnedMessage) {
+    console.error('No response from server')
+    isRequestProcessing.value = false
+    return
   }
+
+  currentConversation.value?.messages.push(returnedMessage)
+
+  UpdateTitle()
+
   isRequestProcessing.value = false
+}
+
+async function UpdateTitle(): Promise<void> {
+  if (!currentConversation.value) {
+    return
+  }
+  const header = await apiService.GetConversationHeader(currentConversation.value.id)
+  if (header) {
+    currentConversation.value.title = header.title
+  }
 }
 
 async function createNewConversation(): Promise<void> {
@@ -51,22 +58,9 @@ async function createNewConversation(): Promise<void> {
     return
   }
 
-  try {
-    const response = await fetch('https://localhost:7192/conversation', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title: currentConversation.value?.title }),
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const createdConversation: Conversation = await response.json()
-    currentConversation.value.id = createdConversation.id
-    console.log('Created conversation with ID:', createdConversation.id)
-  } catch (error) {
-    console.error('Error creating conversation:', error)
+  const newConversation = await apiService.CreateNewConversation()
+  if (newConversation) {
+    currentConversation.value.id = newConversation.id
   }
 }
 
@@ -84,10 +78,12 @@ vueOnMounted(mounted)
 
 <template>
   <div class="active-conversation">
-    <h2>Active Conversation</h2>
-    <div>
+    <div class="conversation-header">
+      <h2>{{ currentConversation?.title || 'New Conversation' }}</h2>
+    </div>
+
+    <div class="message-container">
       <div v-if="currentConversation">
-        <h3>{{ currentConversation.title || 'New Conversation' }}</h3>
         <div
           v-for="(message, index) in currentConversation.messages"
           :key="index"
@@ -100,24 +96,18 @@ vueOnMounted(mounted)
         <p>No active conversation. Please select or start a new conversation.</p>
       </div>
     </div>
-    <div>
+
+    <div id="messageInput">
       <textarea
         type="text"
         :disabled="isRequestProcessing"
         name="newMessage"
         id="newMessage"
-        placeholder="Type a message..."
-        style="width: 100%; padding: 8px; box-sizing: border-box; max-height: 100px"
+        placeholder="Poke and prod, I'm ready..."
         v-model="newMessage"
       >
       </textarea>
-      <button
-        style="margin-top: 8px; padding: 8px 16px"
-        @click="sendMessage"
-        :disabled="isRequestProcessing"
-      >
-        Send
-      </button>
+      <button @click="sendMessage" :disabled="isRequestProcessing">Send</button>
     </div>
   </div>
 </template>
@@ -128,6 +118,43 @@ vueOnMounted(mounted)
   min-width: 800px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
-  background-color: bisque;
+  display: flex;
+  max-height: 80vh;
+  flex-direction: column;
+}
+
+.conversation-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  padding: 0 0;
+  border-bottom: 1px solid #eee;
+  z-index: 1;
+}
+
+.message-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0;
+}
+
+#messageInput {
+  border-top: 1px solid #eee;
+  padding: 10px 0;
+  background-color: white;
+  display: flex;
+  gap: 8px;
+}
+
+#newMessage {
+  flex: 1;
+  padding: 8px;
+  box-sizing: border-box;
+  max-height: 100px;
+}
+
+button {
+  align-self: flex-start;
+  padding: 8px 16px;
 }
 </style>
