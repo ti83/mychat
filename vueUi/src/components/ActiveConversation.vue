@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted as vueOnMounted } from 'vue'
+import { computed, ref, onMounted as vueOnMounted } from 'vue'
 import type { Conversation } from '@/types/Conversation'
 import type { Message } from '@/types/Message'
 import ConversationApiService from '@/services/ConversationApiService'
@@ -7,7 +7,7 @@ import MessageItem from './MessageItem.vue'
 import { ConversationStore } from '@/store/ConversationStore'
 
 const newMessage = ref('')
-const currentConversation = ref<Conversation | null>(null)
+//const currentConversation = computed(() => store.currentConversation)
 const isRequestProcessing = ref(false)
 const apiService = new ConversationApiService()
 const store = ConversationStore()
@@ -25,10 +25,10 @@ async function sendMessage(): Promise<void> {
     text: newMessage.value,
     source: 'user',
   }
-  currentConversation.value?.messages.push(newMsg)
+  store.currentConversation?.messages.push(newMsg)
   newMessage.value = ''
   const returnedMessage: Message = await apiService.SendMessage(
-    currentConversation.value!.id,
+    store.currentConversation!.id,
     newMsg,
   )
 
@@ -38,7 +38,7 @@ async function sendMessage(): Promise<void> {
     return
   }
 
-  currentConversation.value?.messages.push(returnedMessage)
+  store.currentConversation?.messages.push(returnedMessage)
 
   UpdateTitle()
 
@@ -46,31 +46,31 @@ async function sendMessage(): Promise<void> {
 }
 
 async function UpdateTitle(): Promise<void> {
-  if (!currentConversation.value) {
+  if (!store.currentConversation) {
     return
   }
-  const header = await apiService.GetConversationHeader(currentConversation.value.id)
+  const header = await apiService.GetConversationHeader(store.currentConversation.id)
   if (header) {
-    currentConversation.value.title = header.title
+    store.currentConversation.title = header.title
     store.updateTitle(store, header.id, header.title)
   }
 }
 
 async function createNewConversation(): Promise<void> {
-  if (currentConversation.value?.id != 0) {
+  if (store.currentConversation?.id != 0) {
     return
   }
 
   const newConversation = await apiService.CreateNewConversation()
   if (newConversation) {
-    currentConversation.value.id = newConversation.id
+    store.currentConversation.id = newConversation.id
     store.addConversation(store, newConversation)
   }
 }
 
 function mounted() {
   // Simulate loading a conversation
-  currentConversation.value = {
+  store.currentConversation = {
     id: 0,
     title: '',
     messages: [],
@@ -83,13 +83,13 @@ vueOnMounted(mounted)
 <template>
   <div class="active-conversation">
     <div class="conversation-header">
-      <h2>{{ currentConversation?.title || 'New Conversation' }}</h2>
+      <h2>{{ store.currentConversation?.title || 'New Conversation' }}</h2>
     </div>
 
     <div class="message-container">
-      <div v-if="currentConversation">
+      <div v-if="store.currentConversation">
         <div
-          v-for="(message, index) in currentConversation.messages"
+          v-for="(message, index) in store.currentConversation.messages"
           :key="index"
           style="margin-bottom: 10px"
         >

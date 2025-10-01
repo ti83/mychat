@@ -48,7 +48,14 @@ export const ConversationStore = defineStore('ConversationStore', {
     deleteConversation(state: ConvesationStoreState, id: number) {
       state.conversations = state.conversations.filter((c) => c.id !== id)
       if (state.currentConversation && state.currentConversation.id === id) {
-        state.currentConversation = null
+        this.resetCurrentConversation(state)
+      }
+    },
+    resetCurrentConversation(state: ConvesationStoreState) {
+      state.currentConversation = {
+        id: 0,
+        title: '',
+        messages: [],
       }
     },
   },
