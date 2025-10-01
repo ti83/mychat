@@ -1,22 +1,23 @@
-<script lang="ts">
-export default {
-  name: 'ConversationList',
-  data() {
-    return {
-      conversations: [
-        { id: 1, title: 'Project Discussion' },
-        { id: 2, title: 'Family Group' },
-        { id: 3, title: 'Book Club' },
-        { id: 4, title: 'Tech Talk' },
-        { id: 5, title: 'Weekend Plans' },
-      ],
+<script lang="ts" setup>
+import { ConversationStore } from '@/store/ConversationStore'
+import type { ConversationHeader } from '@/types/ConversationHeader'
+import ConversationApiService from '@/services/ConversationApiService'
+
+const store = ConversationStore()
+const apiService = new ConversationApiService()
+function deleteConversation(index: number) {
+  const conversation: ConversationHeader = store.conversations[index]
+  if (conversation.id === 0) {
+    store.conversations.splice(index, 1)
+    return
+  }
+  apiService.DeleteConversation(conversation.id).then((response) => {
+    if (response) {
+      store.deleteConversation(store, conversation.id)
+    } else {
+      console.error('Failed to delete conversation')
     }
-  },
-  methods: {
-    deleteConversation(index: number) {
-      this.conversations.splice(index, 1)
-    },
-  },
+  })
 }
 </script>
 
@@ -24,11 +25,11 @@ export default {
   <div class="conversation-list">
     <h2>Conversations</h2>
     <div
-      v-for="(conversation, index) in conversations"
+      v-for="(conversation, index) in store.conversations"
       :key="conversation.id"
       class="conversation-item"
     >
-      <span>{{ conversation.title }}</span>
+      <span>{{ conversation.title ? conversation.title : 'New Conversation' }}</span>
       <button @click="deleteConversation(index)">Delete</button>
     </div>
   </div>

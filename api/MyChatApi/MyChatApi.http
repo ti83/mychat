@@ -80,3 +80,6 @@ GET {{MyChatApi_HostAddress}}/conversation/{{id5}}/header
 GET {{MyChatApi_HostAddress}}/conversation
 
 ###
+
+@id6=1
+DELETE {{MyChatApi_HostAddress}}/{{id6}}

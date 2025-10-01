@@ -4,11 +4,13 @@ import type { Conversation } from '@/types/Conversation'
 import type { Message } from '@/types/Message'
 import ConversationApiService from '@/services/ConversationApiService'
 import MessageItem from './MessageItem.vue'
+import { ConversationStore } from '@/store/ConversationStore'
 
 const newMessage = ref('')
 const currentConversation = ref<Conversation | null>(null)
 const isRequestProcessing = ref(false)
 const apiService = new ConversationApiService()
+const store = ConversationStore()
 
 async function sendMessage(): Promise<void> {
   if (!newMessage.value.trim()) {
@@ -50,6 +52,7 @@ async function UpdateTitle(): Promise<void> {
   const header = await apiService.GetConversationHeader(currentConversation.value.id)
   if (header) {
     currentConversation.value.title = header.title
+    store.updateTitle(store, header.id, header.title)
   }
 }
 
@@ -61,6 +64,7 @@ async function createNewConversation(): Promise<void> {
   const newConversation = await apiService.CreateNewConversation()
   if (newConversation) {
     currentConversation.value.id = newConversation.id
+    store.addConversation(store, newConversation)
   }
 }
 
