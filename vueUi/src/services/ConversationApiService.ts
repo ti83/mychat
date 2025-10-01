@@ -1,4 +1,5 @@
 import type { ConversationHeader } from '@/types/ConversationHeader'
+import type { Conversation } from '@/types/Conversation'
 import type { Message } from '@/types/Message'
 
 export default class ConversationApiService {
@@ -20,7 +21,7 @@ export default class ConversationApiService {
       const header: ConversationHeader = await response.json()
       return header
     } catch (error) {
-      console.error('Error fetching conversation title:', error)
+      console.error('Error fetching conversation header:', error)
       throw error
     }
   }
@@ -101,6 +102,23 @@ export default class ConversationApiService {
     } catch (error) {
       console.error('Error deleting conversation:', error)
       return false
+    }
+  }
+
+  public async GetFullConversation(id: number): Promise<Conversation | null> {
+    try {
+      const url = `${this.apiBaseUrl}/${id}`
+      const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const fullConversation: Conversation = await response.json()
+      return fullConversation
+    } catch (error) {
+      console.error('Error fetching conversation:', error)
+      throw error
     }
   }
 }
