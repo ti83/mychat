@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import ConversationList from './ConversationList.vue'
 import ActiveConversation from './ActiveConversation.vue'
+import { ConversationStore } from '@/store/ConversationStore'
+const store = ConversationStore()
+onMounted(() => {
+  store.fetchConversations(store)
+})
 </script>
 
 <template>

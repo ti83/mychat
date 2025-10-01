@@ -69,4 +69,38 @@ export default class ConversationApiService {
       throw error
     }
   }
+
+  public async GetConversationList(): Promise<Array<ConversationHeader>> {
+    try {
+      const url = `${this.apiBaseUrl}/conversation`
+      const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const conversations: Array<ConversationHeader> = await response.json()
+      return conversations
+    } catch (error) {
+      console.error('Error fetching conversation list:', error)
+      return []
+    }
+  }
+
+  public async DeleteConversation(id: number): Promise<boolean> {
+    try {
+      const url = `${this.apiBaseUrl}/${id}`
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return true
+    } catch (error) {
+      console.error('Error deleting conversation:', error)
+      return false
+    }
+  }
 }

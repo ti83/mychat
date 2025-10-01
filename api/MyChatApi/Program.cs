@@ -40,6 +40,7 @@ conversations
     .MapPost("/ask/{id}", conversationService.AskQuestion)
     .WithRequestTimeout(TimeSpan.FromMinutes(5)); 
 conversations.MapPost("/suggest-title", conversationService.SuggestConversationTitleFromPrompt);
+conversations.MapDelete("/{id}", conversationService.DeleteConversation);
 
 app.Run();
 

@@ -155,5 +155,15 @@ namespace MyChatApi
             await context.Response.WriteAsync(json);
             await context.Response.Body.FlushAsync(cancellationToken);
         }
+
+        public async Task<IResult> DeleteConversation(int id)
+        {
+            var existingConversation = await _db.Conversations.FindAsync(id);
+            if (existingConversation is null) return TypedResults.NotFound();
+            _db.Conversations.Remove(existingConversation);
+            await _db.SaveChangesAsync();
+            return TypedResults.NoContent();
+
+        }
     }
 }
