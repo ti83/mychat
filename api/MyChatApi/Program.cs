@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyChatApi;
 using OllamaSharp;
-using OllamaSharp.Models;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ConversationDb>(opt => opt.UseInMemoryDatabase("ConversationList"));
@@ -11,7 +11,6 @@ builder.Services.AddScoped<ConversationService>();
 var ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"));
 ollamaClient.SelectedModel = "llama3";
 builder.Services.AddSingleton(ollamaClient);
-
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
@@ -33,6 +32,7 @@ var conversationService = app.Services.CreateScope().ServiceProvider.GetRequired
 conversations.MapGet("/", conversationService.GetAllConversations);
 conversations.MapGet("/{id}", conversationService.GetConversation);
 conversations.MapGet("/{id}/header", conversationService.GetConversationHeader);
+conversations.MapPut("/{id}/header", conversationService.UpdateHeader);
 conversations.MapPost("/", conversationService.CreateNewConversation);
 conversations.MapPut("/{id}", conversationService.UpdateConversation);
 conversations.MapPost("/{id}/message", conversationService.AddMessageToConversation);

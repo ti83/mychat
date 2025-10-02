@@ -26,7 +26,7 @@ export default class ConversationApiService {
     }
   }
 
-  public async CreateNewConversation(): Promise<ConversationHeader> {
+  public async CreateNewConversation(title: string): Promise<ConversationHeader> {
     try {
       const url = `${this.apiBaseUrl}/`
       const response = await fetch(url, {
@@ -34,7 +34,7 @@ export default class ConversationApiService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title: '' }),
+        body: JSON.stringify({ title }),
       })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -119,6 +119,22 @@ export default class ConversationApiService {
     } catch (error) {
       console.error('Error fetching conversation:', error)
       throw error
+    }
+  }
+
+  async UpdateConversationTitle(conversationId: number, newTitle: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.apiBaseUrl}/${conversationId}/header`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: newTitle }),
+      })
+      return response.ok
+    } catch (error) {
+      console.error('Error updating conversation title:', error)
+      return false
     }
   }
 }
