@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted as vueOnMounted } from 'vue'
+import { ref, onMounted as vueOnMounted } from 'vue'
 import type { Message } from '@/types/Message'
 import ConversationApiService from '@/services/ConversationApiService'
 import MessageItem from './MessageItem.vue'
@@ -9,7 +9,6 @@ const defaultTitle: string = 'New Conversation'
 const newMessage = ref('')
 const isEditingTitle = ref(false)
 const editableTitle = ref('')
-//const currentConversation = computed(() => store.currentConversation)
 const isRequestProcessing = ref(false)
 const apiService = new ConversationApiService()
 const store = ConversationStore()
