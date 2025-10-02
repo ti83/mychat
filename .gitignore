@@ -1,0 +1,64 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build Results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Tt]emp/
+*.pdb
+*.ilk
+*.aps
+*.bsc
+*.sbr
+*.res
+*.pch
+*.idb
+*.ncb
+*.tlog
+*.log
+*.bak
+*.cache
+*.sdf
+*.vshost.*
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+*.lock.json
+project.assets.json
+
+# Rider
+.idea/
+
+# DotNet tools
+.config/dotnet-tools.json
+
+# Test Results
+TestResults/
+
+# Resharper
+*.resharper
+
+# StyleCop
+StyleCop.Cache
+
+# Local Settings
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
+launchSettings.json
+
+# Miscellaneous
+Thumbs.db
+ehthumbs.db
+Desktop.ini

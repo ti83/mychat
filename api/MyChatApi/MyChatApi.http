@@ -1,0 +1,85 @@
+﻿@MyChatApi_HostAddress = https://localhost:7192
+
+
+POST {{MyChatApi_HostAddress}}/conversation
+Content-Type: application/json
+
+{
+  "title":"this is a another test"
+}
+
+###
+POST {{MyChatApi_HostAddress}}/conversation
+Content-Type: application/json
+
+{
+  "title":""
+}
+
+###
+
+
+
+@id1=1
+POST {{MyChatApi_HostAddress}}/conversation/{{id1}}/message
+Content-Type: application/json
+
+{
+  "text":"I don't know this carmen san dieago. Can you please elaborate?",
+  "source":"llm",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+###
+
+@id2=1
+GET {{MyChatApi_HostAddress}}/conversation/{{id2}}
+
+###
+
+POST {{MyChatApi_HostAddress}}/ask
+{
+  "text":"I don't know this carmen san dieago. Can you please elaborate?",
+  "source":"user",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+
+###
+
+@id3=1
+POST {{MyChatApi_HostAddress}}/conversation/ask/{{id3}}
+Content-Type: application/json
+
+{
+  "text":"Please tell me a childrens story about mice.",
+  "source":"user",
+  "timestamp":"2025-09-23T21:30:56Z"
+}
+
+###
+
+@id4=1
+POST {{MyChatApi_HostAddress}}/conversation/ask/{{id4}}
+Content-Type: application/json
+
+{"TimeStamp":"2025-09-29T21:38:27.187Z","Text":"tell me a story about a cowboy","Source":"user"}
+###
+
+@prompt="I would like you to give me an example of how to create vue.js app that will act as a chat bot.  Use TypeScript instead of javascript.  I would like it to use material design."
+POST {{MyChatApi_HostAddress}}/conversation/suggest-title?prompt={{prompt}}
+
+###
+
+
+@id5=1
+GET {{MyChatApi_HostAddress}}/conversation/{{id5}}/header
+
+###
+
+GET {{MyChatApi_HostAddress}}/conversation
+
+###
+
+@id6=1
+DELETE {{MyChatApi_HostAddress}}/{{id6}}
