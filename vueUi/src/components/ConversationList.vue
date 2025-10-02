@@ -51,7 +51,13 @@ function addNewConversation() {
       <span @click="selectConversation(conversation.id)" class="item-link">{{
         conversation.title ? conversation.title : 'New Conversation'
       }}</span>
-      <button @click="deleteConversation(conversation.id)" class="delete">Delete</button>
+      <button
+        @click="deleteConversation(conversation.id)"
+        class="delete"
+        :disabled="conversation.title ? false : true"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </template>
@@ -90,6 +96,22 @@ button.delete {
 }
 button.delete:hover {
   background: #c0392b;
+}
+button.delete:disabled {
+  background: #c0c0c0;
+  color: black;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: arrow;
+}
+button.delete:disabled:hover {
+  background: #c0c0c0;
+  color: black;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: arrow;
 }
 button.add {
   background: #009e00;

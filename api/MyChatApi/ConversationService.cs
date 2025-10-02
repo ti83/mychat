@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using OllamaSharp;
 using OllamaSharp.Models;
@@ -52,6 +54,16 @@ namespace MyChatApi
             existingConversation.Messages = conversation.Messages;
             await _db.SaveChangesAsync();
             return TypedResults.NoContent();
+        }
+
+        public async Task<IResult> UpdateHeader(int id, ConversationItemDto conversation)
+        {
+            var existingConversation = await _db.Conversations.FindAsync(id);
+            if (existingConversation is null) return TypedResults.NotFound();
+            existingConversation.Title = conversation.Title;
+            await _db.SaveChangesAsync();
+            return TypedResults.NoContent();
+
         }
 
         public async Task<IResult> AddMessageToConversation(int id, MessageDto message)

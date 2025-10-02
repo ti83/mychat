@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted as vueOnMounted } from 'vue'
-import type { Conversation } from '@/types/Conversation'
 import type { Message } from '@/types/Message'
 import ConversationApiService from '@/services/ConversationApiService'
 import MessageItem from './MessageItem.vue'
 import { ConversationStore } from '@/store/ConversationStore'
 
+const defaultTitle: string = 'New Conversation'
 const newMessage = ref('')
+const isEditingTitle = ref(false)
+const editableTitle = ref('')
 //const currentConversation = computed(() => store.currentConversation)
 const isRequestProcessing = ref(false)
 const apiService = new ConversationApiService()
@@ -60,8 +62,9 @@ async function createNewConversation(): Promise<void> {
   if (store.currentConversation?.id != 0) {
     return
   }
-
-  const newConversation = await apiService.CreateNewConversation()
+  const newTitle =
+    store.currentConversation?.title == defaultTitle ? '' : store.currentConversation?.title
+  const newConversation = await apiService.CreateNewConversation(newTitle)
   if (newConversation) {
     store.currentConversation.id = newConversation.id
     store.addConversation(store, newConversation)
@@ -77,13 +80,47 @@ function mounted() {
   }
 }
 
+function startEditingTitle() {
+  editableTitle.value = store.currentConversation?.title || defaultTitle
+  isEditingTitle.value = true
+}
+
+async function saveTitle() {
+  if (!store.currentConversation) return
+
+  const newTitle = editableTitle.value.trim()
+  if (newTitle && store.currentConversation.id !== 0) {
+    const success = await apiService.UpdateConversationTitle(store.currentConversation.id, newTitle)
+    if (success) {
+      store.currentConversation.title = newTitle
+      store.updateTitle(store, store.currentConversation.id, newTitle)
+    }
+  } else if (newTitle && store.currentConversation.id === 0) {
+    // If it's a new conversation, just update the title locally
+    store.currentConversation.title = newTitle
+  }
+  isEditingTitle.value = false
+}
+
 vueOnMounted(mounted)
 </script>
 
 <template>
   <div class="active-conversation">
     <div class="conversation-header">
-      <h2>{{ store.currentConversation?.title || 'New Conversation' }}</h2>
+      <div v-if="isEditingTitle" class="title-edit">
+        <input
+          v-model="editableTitle"
+          @blur="saveTitle"
+          @keyup.enter="saveTitle"
+          @keyup.esc="isEditingTitle = false"
+          ref="titleInput"
+          type="text"
+        />
+      </div>
+      <h2 v-else @click="startEditingTitle">
+        {{ store.currentConversation?.title || defaultTitle }}
+      </h2>
     </div>
 
     <div class="message-container">
@@ -160,5 +197,14 @@ vueOnMounted(mounted)
 button {
   align-self: flex-start;
   padding: 8px 16px;
+}
+
+.title-edit input {
+  font-size: 1.5em;
+  font-weight: normal;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 </style>
